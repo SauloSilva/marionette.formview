@@ -4,6 +4,7 @@ describe("FormView", function () {
   "use strict";
   var stopSubmit,
       readySpy,
+      runInitializersSpy,
       submitSpy,
       submitFailSpy,
       validationErrorSpy;
@@ -16,6 +17,7 @@ describe("FormView", function () {
     };
 
     readySpy = jasmine.createSpy('onReady');
+    runInitializersSpy = jasmine.createSpy('runInitializers');
     submitSpy = jasmine.createSpy('onSubmit').andCallFake(stopSubmit);
     submitFailSpy = jasmine.createSpy('onSubmitFail');
     validationErrorSpy = jasmine.createSpy('onValidationFail');
@@ -39,6 +41,18 @@ describe("FormView", function () {
     form.render();
 
     expect(form.model.get('fname')).toBe(dataHash.fname);
+  });
+
+  it('should Call runInitializers when form is rendered', function () {
+    var form = new (Marionette.FormView.extend({
+      template : "#form-template",
+      data     : {},
+      fields   : {},
+      runInitializers: runInitializersSpy
+    }))();
+    form.render();
+
+    expect(form.runInitializers).toHaveBeenCalled();
   });
 
   it("Should populate fields from model", function () {
@@ -292,7 +306,6 @@ describe("FormView", function () {
     });
   });
 
-
   it("Should allow a model.clear() with options other than {changes : obj}", function() {
 
     var model = new Backbone.Model({
@@ -303,7 +316,7 @@ describe("FormView", function () {
         zip: '11111'
       }
     });
-    
+
     var fields = {
       address: {
         el: '.address'
